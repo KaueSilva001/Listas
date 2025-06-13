@@ -1,0 +1,127 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+struct Pessoa {
+    string nome;
+    int idade;
+    float altura;
+    Pessoa* proximo;
+};
+
+
+void inserirPessoa(Pessoa*& inicio) {
+    Pessoa* novaPessoa = new Pessoa;
+
+    cout << "Digite o nome: ";
+    getline(cin >> ws, novaPessoa->nome);
+    cout << "Digite a idade: ";
+    cin >> novaPessoa->idade;
+    cout << "Digite a altura (em metros): ";
+    cin >> novaPessoa->altura;
+
+    novaPessoa->proximo = NULL;  
+
+    if (inicio == NULL) {
+        inicio = novaPessoa;
+    } else {
+        Pessoa* atual = inicio;
+        while (atual->proximo != NULL) {
+            atual = atual->proximo;
+        }
+        atual->proximo = novaPessoa;
+    }
+}
+
+
+void exibirLista(Pessoa* inicio) {
+    if (inicio == NULL) {
+        cout << "Lista vazia.\n";
+        return;
+    }
+
+    cout << "\nLista de pessoas cadastradas:\n";
+    Pessoa* atual = inicio;
+    while (atual != NULL) {
+        cout << "Nome: " << atual->nome
+             << ", Idade: " << atual->idade
+             << ", Altura: " << atual->altura << " m\n";
+        atual = atual->proximo;
+    }
+    cout << endl;
+}
+
+void removerPessoa(Pessoa*& inicio, const string& nome) {
+    if (inicio == NULL) {
+        cout << "Lista vazia. Nada a remover.\n";
+        return;
+    }
+
+    Pessoa* atual = inicio;
+    Pessoa* anterior = NULL;
+
+    while (atual != NULL && atual->nome != nome) {
+        anterior = atual;
+        atual = atual->proximo;
+    }
+
+    if (atual == NULL) {
+        cout << "Pessoa com nome \"" << nome << "\" não encontrada.\n";
+    } else {
+        if (anterior == NULL) {
+            inicio = atual->proximo;
+        } else {
+            anterior->proximo = atual->proximo;
+        }
+        delete atual;
+        cout << "Pessoa removida com sucesso.\n";
+    }
+}
+
+void liberarLista(Pessoa*& inicio) {
+    Pessoa* atual = inicio;
+    while (atual != NULL) {
+        Pessoa* temp = atual;
+        atual = atual->proximo;
+        delete temp;
+    }
+    inicio = NULL;
+}
+
+int main() {
+    Pessoa* lista = NULL;
+    char opcao;
+
+    do {
+        do {
+            inserirPessoa(lista);
+            exibirLista(lista);
+            cout << "Deseja inserir outra pessoa? (s/n): ";
+            cin >> opcao;
+        } while (opcao == 's' || opcao == 'S');
+
+        do {
+            string nome;
+            cout << "Deseja remover uma pessoa? (s/n): ";
+            cin >> opcao;
+            if (opcao == 's' || opcao == 'S') {
+                cout << "Digite o nome da pessoa a remover: ";
+                getline(cin >> ws, nome);
+                removerPessoa(lista, nome);
+                exibirLista(lista);
+            }
+        } while (opcao == 's' || opcao == 'S');
+
+        cout << "Deseja inserir mais pessoas? (s/n): ";
+        cin >> opcao;
+
+    } while (opcao == 's' || opcao == 'S');
+
+    cout << "\nLista final de pessoas:\n";
+    exibirLista(lista);
+
+    liberarLista(lista);
+
+    return 0;
+}
